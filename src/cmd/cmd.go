@@ -95,6 +95,20 @@ func Command() []*cobra.Command {
 		},
 	}
 
+	var sshCmd = &cobra.Command{
+		Use:     "ssh",
+		Short:   "SSH Release",
+		Example: "ssh",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := console.SSHRelease()
+			if err != nil {
+				_ = console.SendMessage(false, fmt.Sprint(err))
+				color.Red(fmt.Sprint(err))
+				os.Exit(1)
+			}
+		},
+	}
+
 	var nacosSyncCmd = &cobra.Command{
 		Use:     "nacosSync",
 		Short:   "Nacos Config Sync",
@@ -172,6 +186,7 @@ func Command() []*cobra.Command {
 		tagCmd,
 		removeCmd,
 		releaseCmd,
+		sshCmd,
 		nacosSyncCmd,
 		environmentCmd,
 	}

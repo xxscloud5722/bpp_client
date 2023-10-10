@@ -35,6 +35,9 @@ func NewScriptEngine(working string) *ScriptEngine {
 
 // CreateBuild 创建一个构建脚本
 func (engine *ScriptEngine) CreateBuild(projectId, packageType string) error {
+	// 读取镜像类型
+	imageName, ok := environment.Get("P_IMAGE_NAME")
+	imageName = strings.TrimSpace(imageName)
 	var content = []string{
 		fmt.Sprintf("mkdir -p /opt/repository/%s", projectId),
 	}
@@ -44,10 +47,10 @@ func (engine *ScriptEngine) CreateBuild(projectId, packageType string) error {
 		content = append(content, scriptValue)
 	}
 	var script string
-	if !environment.IsIgnore() {
-		content = append(content, "docker build -t ${1} .")
-		script = engine.parse(strings.Join(content, "\n"))
+	if !environment.IsIgnore() && ok && imageName != "" {
+		content = append(content, "docker build -t "+imageName+" .")
 	}
+	script = engine.parse(strings.Join(content, "\n"))
 	err := os.WriteFile(path.Join(engine.working, outputScriptFileName), []byte(script), 777)
 	if err != nil {
 		return err

@@ -256,6 +256,37 @@ func KubernetesRelease() error {
 	return nil
 }
 
+// SSHRelease 发布服务.
+func SSHRelease() error {
+	// 读取工作目录
+	working, ok := environment.Get("CI_PROJECT_DIR")
+	if !ok {
+		return errors.New(fmt.Sprintf("Environment variable ${%s} not exist", "CI_PROJECT_DIR"))
+	}
+	// 读取服务器
+	server, ok := environment.Get("server")
+	if !ok {
+		return errors.New(fmt.Sprintf("Environment variable ${%s} not exist", "server"))
+	}
+	// 读取服务器路径
+	serverPath, ok := environment.Get("path")
+	if !ok {
+		return errors.New(fmt.Sprintf("Environment variable ${%s} not exist", "path"))
+	}
+	// 读取服务器需要执行的脚本
+	before, ok := environment.Get("before")
+	after, ok := environment.Get("after")
+	// 更新服务
+	err := engine.ExecuteSSHReleaseService(working, server, serverPath, before, after)
+	if err != nil {
+		return err
+	}
+
+	// 通知
+	_ = SendMessage(true, "")
+	return nil
+}
+
 // NacosSync 同步配置.
 func NacosSync() error {
 	// 服务类型
