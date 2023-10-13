@@ -143,7 +143,8 @@ func ExecuteSSHReleaseService(working, server, serverPath, before, after string)
 	command = []string{
 		"cd " + serverPath,
 		"unzip " + remoteFilePath,
-		"mv -f " + remoteFilePath + " /tmp/gitlab_" + uuid.New().String()}
+		"mv -f " + remoteFilePath + " /tmp/gitlab_" + uuid.New().String(),
+	}
 	color.Blue(strings.Join(command, " && "))
 	output, err = runCommand(sshDial, strings.Join(command, " && "))
 	if err != nil {

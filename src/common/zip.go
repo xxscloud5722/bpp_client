@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"github.com/samber/lo"
 	"io"
 	"os"
 	"path"
@@ -42,7 +43,7 @@ func Zip(src, target string, delete bool) error {
 	}()
 
 	// 下面来将文件写入 zw ，因为有可能会有很多个目录及文件，所以递归处理
-	var startIndex = len(src)
+	var startIndex = len(src) - lo.If(strings.HasPrefix(src, "."), 1).Else(0)
 	err = filepath.Walk(src, func(filePath string, fi os.FileInfo, errBack error) (err error) {
 		if errBack != nil {
 			return errBack
@@ -70,6 +71,8 @@ func Zip(src, target string, delete bool) error {
 		if fi.IsDir() {
 			fh.Name += "/"
 		}
+
+		fh.Name = strings.ReplaceAll(fh.Name, "\\", "/")
 
 		// 写入文件信息，并返回一个 Write 结构
 		w, err := zw.CreateHeader(fh)
