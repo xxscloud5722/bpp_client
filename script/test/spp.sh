@@ -251,6 +251,7 @@ function remove() {
 
 function release() {
   echo "release ..."
+  /usr/local/bin/message.sh true '构建成功' colonyEnv="${colonyEnv}"
 }
 
 function nacos_sync() {
