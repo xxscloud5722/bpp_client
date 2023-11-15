@@ -1,3 +1,12 @@
+# =================================================================
+# 程序构建脚本
+# 变量说明：
+#   - CI_ Gitlab 默认变量
+#   - P_  项目变量 （CI 文件内申明）
+#   - 大写变量 全局变量
+#   - 驼峰变量 局部变量
+# =================================================================
+
 set -e
 
 # 服务器读取脚本
@@ -134,9 +143,7 @@ function docker_auth() {
 }
 
 function package() {
-
   check "$P_PACKAGE_TYPE" 'P_PACKAGE_TYPE'
-  check "$P_SERVICE_NAME" 'P_SERVICE_NAME'
 
   # 基础脚本
   S_SCRIPT=" set -e \n function error_handler() { \n message.sh false '构建失败' colonyEnv=${colonyEnv} \n exit 1 \n }"
@@ -252,11 +259,14 @@ function remove() {
 
 function release() {
   echo "release ..."
+  pp release colonyEnv="${colonyEnv}"
   message.sh true '构建成功' colonyEnv="${colonyEnv}"
 }
 
 function nacos_sync() {
   echo "nacos_sync ..."
+  pp nacosSync
+  message.sh true '构建成功' colonyEnv="Nacos"
 }
 
 function ssh() {
@@ -268,33 +278,43 @@ function ssh() {
   check "$path" 'path'
 
   # 获取用户
-  server=$(env "GS_SERVER_$server")
-  rows=${server#*#}
-  IFS=$'\n' read -ra array <<< "$rows"
+  config=$(env "GS_SERVER_$server")
+  rows=${config#*#}
+  readarray -t array <<< "$rows"
   host="${array[0]}"
   port="${array[1]}"
   username="${array[2]}"
   password="${array[3]}"
 
+  echo "host: $host"
+  echo "port: $port"
+  echo "username: $username"
+  echo "password: $password"
+
   # 压缩文件
-  tar -czvf install.tar.gz "$P_OUTPUT"
+  if [ -f "$P_OUTPUT" ]; then
+    tar -czvf install.tar.gz --transform="s,.*\(/[^/]*\)$,\1," "$P_OUTPUT"
+  else
+    tar -czvf install.tar.gz --transform="s,^${P_OUTPUT#/}/,," "$P_OUTPUT"
+  fi
 
   uuid=$(uuidgen)
 
   # 上传前
-  ssh_a=" mkdir -p ${path} \n"
+  # shellcheck disable=SC2154
+  ssh_a="$before \n"
+  ssh_a="$ssh_a mkdir -p ${path} \n"
   ssh_a="$ssh_a mv -f ${path} /tmp/gitlab_${uuid} \n"
   ssh_a="$ssh_a mkdir -p ${path} \n"
-  # shellcheck disable=SC2154
-  ssh_a="$ssh_a $before"
 
   echo "==================== SSH-A ====================="
   echo -e "$ssh_a"
   echo "================================================"
   echo -e "$ssh_a" > 'ssh_a.sh'
-  sshpass -p "$password" ssh "${username}@${host}" 'bash -s' < ssh_a.sh
+  sshpass -p "$password" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p "${port}" "${username}@${host}" 'bash -s' < ssh_a.sh
 
   # 上传文件
+  echo "Upload File ...."
   sshpass -p "$password" scp -P "${port}" ./install.tar.gz "${username}@${host}:${path}/install.tar.gz"
 
   # 上传后
@@ -308,7 +328,9 @@ function ssh() {
   echo -e "$ssh_b"
   echo "================================================"
   echo -e "$ssh_b" > 'ssh_b.sh'
-  sshpass -p "$password" ssh "${username}@${host}" 'bash -s' < ssh_b.sh
+  sshpass -p "$password" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p "${port}" "${username}@${host}" 'bash -s' < ssh_b.sh
+
+  message.sh true '构建成功' colonyEnv="SSH"
 }
 
 # shellcheck disable=SC2181
@@ -325,7 +347,7 @@ fi
 # 加载Args 动态参数
 for arg in "${@:2}"; do
   echo "$arg"
-  eval "$arg"
+  declare "$arg"
 done
 
 # 切换目录
@@ -351,6 +373,9 @@ then
 elif [ "$1" == "release" ];
 then
   release
+elif [ "$1" == "ssh" ];
+then
+  ssh
 elif [ "$1" == "nacosSync" ];
 then
   nacos_sync

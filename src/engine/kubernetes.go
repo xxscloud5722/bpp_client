@@ -189,12 +189,6 @@ func (k Kubernetes) ReleaseService(namespace, serviceName, newImageName string) 
 
 // parseImageName 解析镜像名称
 func parseImageName(colony, imageName string) (*string, error) {
-	//if strings.Index(strings.ToUpper(colony), "SHLX") > -1 {
-	//	return strings.ReplaceAll(imageName, "registry.", "registry-vpc.")
-	//}
-	//if strings.Index(strings.ToUpper(colony), "SHLZ") > -1 {
-	//	return strings.ReplaceAll(imageName, "registry.", "registry-vpc.")
-	//}
 	colony = strings.ToUpper(colony)
 	if configValue, ok := environment.Get(imageNameConfigKey); ok {
 		var config map[string]interface{}

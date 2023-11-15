@@ -11,76 +11,6 @@ import (
 )
 
 func Command() []*cobra.Command {
-	var packageCmd = &cobra.Command{
-		Use:     "package",
-		Short:   "Generate App Package Script",
-		Example: "package",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.Package()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
-	var pushCmd = &cobra.Command{
-		Use:     "push",
-		Short:   "Docker Image Push",
-		Example: "push",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.DockerPush()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
-	var pullCmd = &cobra.Command{
-		Use:     "pull",
-		Short:   "Docker Image Pull",
-		Example: "pull",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.DockerPull()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
-	var tagCmd = &cobra.Command{
-		Use:     "tag",
-		Short:   "Docker Image Tag",
-		Example: "tag",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.DockerTag()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
-	var removeCmd = &cobra.Command{
-		Use:     "remove",
-		Short:   "Docker Image Remove",
-		Example: "remove",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.DockerRemove()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
 	var releaseCmd = &cobra.Command{
 		Use:     "release",
 		Short:   "Kubernetes Release Config",
@@ -88,21 +18,6 @@ func Command() []*cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := console.KubernetesRelease()
 			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
-				color.Red(fmt.Sprint(err))
-				os.Exit(1)
-			}
-		},
-	}
-
-	var sshCmd = &cobra.Command{
-		Use:     "ssh",
-		Short:   "SSH Release",
-		Example: "ssh",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := console.SSHRelease()
-			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
 				color.Red(fmt.Sprint(err))
 				os.Exit(1)
 			}
@@ -116,7 +31,6 @@ func Command() []*cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := console.NacosSync()
 			if err != nil {
-				_ = console.SendMessage(false, fmt.Sprint(err))
 				color.Red(fmt.Sprint(err))
 				os.Exit(1)
 			}
@@ -180,13 +94,7 @@ func Command() []*cobra.Command {
 	})
 
 	return []*cobra.Command{
-		packageCmd,
-		pushCmd,
-		pullCmd,
-		tagCmd,
-		removeCmd,
 		releaseCmd,
-		sshCmd,
 		nacosSyncCmd,
 		environmentCmd,
 	}

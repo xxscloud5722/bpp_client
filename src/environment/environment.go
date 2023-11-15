@@ -306,22 +306,3 @@ func Remove(key string) error {
 	}
 	return nil
 }
-
-// IsIgnore 是否忽略执行.
-func IsIgnore() bool {
-	stage, ok := Get("CI_JOB_STAGE")
-	if !ok {
-		return false
-	}
-	message, ok := Get("CI_COMMIT_MESSAGE")
-	if !ok {
-		return false
-	}
-	stage = strings.TrimSpace(strings.ToUpper(stage))
-	message = strings.ToUpper(message)
-	// 约定消息是C.开头的则根据执行的stage 执行相关代码
-	if strings.HasPrefix(message, "C.") {
-		return !strings.HasPrefix(message, "C."+strings.ToUpper(stage))
-	}
-	return false
-}

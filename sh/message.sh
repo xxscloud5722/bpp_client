@@ -1,3 +1,8 @@
+# =================================================================
+# Message 消息推送脚本
+# 消息  => 企业微信
+# =================================================================
+
 set -e
 
 # 服务器读取脚本
@@ -8,7 +13,7 @@ function escape() {
   then
     echo ""
   else
-    echo "$1" | sed -e 's/\*//g' -e 's/> //g' -e 's/\n/ /g' -e 's/<br\/>/\n/g'
+    echo "$1" | sed -e 's/\*//g' -e 's/> //g' -e 's/\n/ /g' -e 's/<br\/>/\n/g' -e 's/%/ /g' | tr '\n' ' '
   fi
 }
 
@@ -83,7 +88,12 @@ case $(echo "$env_value" | tr '[:lower:]' '[:upper:]') in
         env="生产环境"
         ;;
     *)
-        env="未知环境"
+        # 如果 $env_value 为空，则设置 env 为 "未知环境"，否则设置为 $env_value
+        if [ -z "$env_value" ]; then
+            env="未知环境"
+        else
+            env="$env_value"
+        fi
         ;;
 esac
 
@@ -100,15 +110,24 @@ link="$CI_JOB_URL"
 # 所有变量
 CONTENT=$(env "GL_MESSAGE_CP_WECHAT_TEMPLATE")
 
+projectName=$(escape "${projectName}")
+author=$(escape "${author}")
+commitRefName=$(escape "${commitRefName}")
+description=$(escape "${description}")
+
 CONTENT=$(echo -n "$CONTENT" | sed "s%#{title}%${title}%g")
 CONTENT=$(echo -n "$CONTENT" | sed "s%#{failReason}%${failReason}%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{projectName}%$(escape "${projectName}")%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{author}%$(escape "${author}")%g")
+echo -e "projectName: ${projectName}"
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{projectName}%${projectName}%g")
+echo -e "author: ${projectName}"
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{author}%${author}%g")
 CONTENT=$(echo -n "$CONTENT" | sed "s%#{env}%${env}%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{commitRefName}%$(escape "${commitRefName}")%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{description}%$(escape "${description}")%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{commitId}%$(escape "${commitId}")%g")
-CONTENT=$(echo -n "$CONTENT" | sed "s%#{link}%$(escape "${link}")%g")
+echo -e "commitRefName: ${commitRefName}"
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{commitRefName}%${commitRefName}%g")
+echo -e "description ${description}"
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{description}%${description}%g")
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{commitId}%${commitId}%g")
+CONTENT=$(echo -n "$CONTENT" | sed "s%#{link}%${link}%g")
 
 REQUEST='{"msgtype": "markdown", "markdown": { "content": "#{content}" }}'
 CONTENT=${CONTENT//"\""/"\\\""}
