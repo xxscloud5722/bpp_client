@@ -4,7 +4,8 @@ set -e
 SERVER=127.0.0.1:8080
 
 function error_handler() {
-  echo "Error occurred. Custom action performed."
+  message.sh false '构建失败' colonyEnv="${colonyEnv}"
+  exit 1
 }
 
 trap 'error_handler' ERR
@@ -138,7 +139,7 @@ function package() {
   check "$P_SERVICE_NAME" 'P_SERVICE_NAME'
 
   # 基础脚本
-  S_SCRIPT=" set -e \n function error_handler() { \n echo 'Error occurred. Custom action performed.' \n }"
+  S_SCRIPT=" set -e \n function error_handler() { \n message.sh false '构建失败' colonyEnv=${colonyEnv} \n exit 1 \n }"
   S_SCRIPT="$S_SCRIPT \n trap 'error_handler' ERR"
   S_SCRIPT="$S_SCRIPT \n mkdir -p /opt/repository/$CI_PROJECT_ID"
 
@@ -251,7 +252,7 @@ function remove() {
 
 function release() {
   echo "release ..."
-  /usr/local/bin/message.sh true '构建成功' colonyEnv="${colonyEnv}"
+  message.sh true '构建成功' colonyEnv="${colonyEnv}"
 }
 
 function nacos_sync() {
