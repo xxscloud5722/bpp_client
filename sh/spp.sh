@@ -12,13 +12,19 @@ set -e
 # 服务器读取脚本
 SERVER=127.0.0.1:8080
 
+# ================================
+# 脚本执行错误处理函数
 function error_handler() {
   message.sh false '构建失败' colonyEnv="${colonyEnv}"
   exit 1
 }
 
+# ================================
+# 监听错误
 trap 'error_handler' ERR
 
+# ================================
+# 获取Key服务器的值
 function env() {
   if [ -z "$1" ]
   then
@@ -28,6 +34,8 @@ function env() {
   fi
 }
 
+# ================================
+# 检查参数预设值
 function check() {
     if [ -z "$1" ]
     then
@@ -36,6 +44,8 @@ function check() {
     fi
 }
 
+# ================================
+# 模板参数解析
 function parse() {
   CONTEXT=$1
   # 前端
@@ -113,6 +123,8 @@ function parse() {
   echo "$CONTEXT"
 }
 
+# ================================
+# Docker 容器授权, 生成配置文件
 function docker_auth() {
   file_path="/root/$P_DOCKER_AUTH_TYPE"
   if [ -e "$file_path" ]; then
@@ -142,6 +154,9 @@ function docker_auth() {
     fi
 }
 
+
+# ================================
+# 命令: 执行打包
 function package() {
   check "$P_PACKAGE_TYPE" 'P_PACKAGE_TYPE'
 
@@ -230,6 +245,8 @@ function package() {
   fi
 }
 
+# ================================
+# 命令: 推送镜像
 function push() {
   check "$P_IMAGE_NAME" 'P_IMAGE_NAME'
   config_path=$(docker_auth)
@@ -237,6 +254,8 @@ function push() {
   docker --config "$config_path" push "$P_IMAGE_NAME"
 }
 
+# ================================
+# 命令: 拉取镜像
 function pull() {
   check "$P_IMAGE_NAME" 'P_IMAGE_NAME'
   config_path=$(docker_auth)
@@ -244,6 +263,8 @@ function pull() {
   docker --config "$config_path" pull "$P_IMAGE_NAME"
 }
 
+# ================================
+# 命令: 修改镜像名称
 function tag() {
   # shellcheck disable=SC2154
   check "$oldImageName" 'oldImageName'
@@ -252,23 +273,31 @@ function tag() {
   docker tag "$oldImageName" "$newImageName"
 }
 
+# ================================
+# 命令: 强制删除镜像
 function remove() {
   check "$P_IMAGE_NAME" 'P_IMAGE_NAME'
   docker rmi -f "$P_IMAGE_NAME"
 }
 
+# ================================
+# 命令: 执行发布程序
 function release() {
   echo "release ..."
   pp release colonyEnv="${colonyEnv}"
   message.sh true '构建成功' colonyEnv="${colonyEnv}"
 }
 
+# ================================
+# 命令: 执行NacosSync 配置同步
 function nacos_sync() {
   echo "nacos_sync ..."
   pp nacosSync
   message.sh true '构建成功' colonyEnv="Nacos"
 }
 
+# ================================
+# 命令: 执行SSH 推送服务
 function ssh() {
   echo "ssh"
   check "$P_OUTPUT" 'P_OUTPUT'
@@ -333,6 +362,9 @@ function ssh() {
   message.sh true '构建成功' colonyEnv="SSH"
 }
 
+
+# --------------- 开始执行 -------------------
+
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
   echo "Error: Last command failed. Exiting."
@@ -352,9 +384,11 @@ done
 
 # 切换目录
 cd "$CI_PROJECT_DIR"
+
 # 输出路径
 echo "Local Path: $(pwd)"
 
+# =========== 执行命令 ================
 if [ "$1" == "package" ];
 then
   package

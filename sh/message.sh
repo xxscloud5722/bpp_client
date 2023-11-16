@@ -8,6 +8,8 @@ set -e
 # 服务器读取脚本
 SERVER=127.0.0.1:8080
 
+# =======================================
+# 内容转义 去掉非法字符
 function escape() {
   if [ -z "$1" ]
   then
@@ -18,6 +20,8 @@ function escape() {
 }
 
 
+# =======================================
+# 获取Key服务器的内容
 function env() {
   if [ -z "$1" ]
   then
@@ -28,8 +32,12 @@ function env() {
   fi
 }
 
+
+# 消息状态
 STATUS=$1
+# 消息内容
 MESSAGE=$2
+
 
 if [ -z "$1" ]; then
     echo "Error: Argument not provided. Exiting."
@@ -44,12 +52,13 @@ fi
 # 加载Args 动态参数
 for arg in "${@:3}"; do
   echo "$arg"
-  eval "$arg"
+  declare "$arg"
 done
 
-
+# 机器人地址
 ROBOT=$(env "GL_MESSAGE_CP_WECHAT_ROBOT")
 
+# 如果是构建成功则输出成功消息
 # shellcheck disable=SC2034
 if [ "$STATUS" = "true" ]; then
   title='<font color="info">构建成功</font>'
@@ -57,6 +66,7 @@ else
   title='<font color="warning">构建失败</font>'
 fi
 
+# 如果是构建失败输出原因
 # shellcheck disable=SC2034
 if [ "$STATUS" = "true" ]; then
   failReason=''
@@ -129,10 +139,13 @@ CONTENT=$(echo -n "$CONTENT" | sed "s%#{description}%${description}%g")
 CONTENT=$(echo -n "$CONTENT" | sed "s%#{commitId}%${commitId}%g")
 CONTENT=$(echo -n "$CONTENT" | sed "s%#{link}%${link}%g")
 
+# 构建参数
 REQUEST='{"msgtype": "markdown", "markdown": { "content": "#{content}" }}'
 CONTENT=${CONTENT//"\""/"\\\""}
 REQUEST=${REQUEST//"#{content}"/"$CONTENT"}
 
+# 打印发送消息内容
 echo -e "$CONTENT"
 
+# 发送消息
 curl -X POST -H "Content-Type: application/json" -d "$REQUEST" "$ROBOT"

@@ -11,6 +11,8 @@ import (
 )
 
 func Command() []*cobra.Command {
+
+	// 发布命令
 	var releaseCmd = &cobra.Command{
 		Use:     "release",
 		Short:   "Kubernetes Release Config",
@@ -24,6 +26,7 @@ func Command() []*cobra.Command {
 		},
 	}
 
+	// 同步Nacos 命令
 	var nacosSyncCmd = &cobra.Command{
 		Use:     "nacosSync",
 		Short:   "Nacos Config Sync",
@@ -37,6 +40,7 @@ func Command() []*cobra.Command {
 		},
 	}
 
+	// 环境变量命令
 	var environmentCmd = &cobra.Command{
 		Use:     "env",
 		Short:   "Environment Operate Admin",
