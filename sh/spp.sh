@@ -284,7 +284,7 @@ function remove() {
 # 命令: 执行发布程序
 function release() {
   echo "release ..."
-  pp release colonyEnv="${colonyEnv}"
+  bpp release colonyEnv="${colonyEnv}"
   message.sh true '构建成功' colonyEnv="${colonyEnv}"
 }
 
@@ -292,7 +292,7 @@ function release() {
 # 命令: 执行NacosSync 配置同步
 function nacos_sync() {
   echo "nacos_sync ..."
-  pp nacosSync
+  bpp nacosSync
   message.sh true '构建成功' colonyEnv="Nacos"
 }
 

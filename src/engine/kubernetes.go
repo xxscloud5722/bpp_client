@@ -269,16 +269,18 @@ func ExecuteReleaseService(colony, env, namespace, serviceName, imageName string
 			return item.Name == namespace
 		})
 		if !namespaceExist {
-			color.Yellow(fmt.Sprintf("[Kubernetes] %s-%s -> %s Namespace Not, ready to Find: %s", colony, env, namespace, namespace+"-"+env))
+			color.Yellow(fmt.Sprintf("[Kubernetes] %s (env:%s) -> %s Namespace Not, ready to Find: %s", colony, env, namespace, namespace+"-"+env))
 			namespace = namespace + "-" + env
 			_, namespaceExist = lo.Find(namespaces, func(item v1.Namespace) bool {
 				return item.Name == namespace
 			})
 		}
 		if !namespaceExist {
-			color.Yellow(fmt.Sprintf("[Kubernetes] %s-%s -> %s Namespace Not", colony, env, namespace))
+			color.Yellow(fmt.Sprintf("[Kubernetes] %s (env:%s) -> %s Namespace Not", colony, env, namespace))
 			return nil
 		}
+
+		color.Blue(fmt.Sprintf("[Kubernetes] Colony Workspace (%s) -> %s ", colony, namespace))
 
 		// 刷新服务
 		err = kubernetesClient.ReleaseService(namespace, serviceName, *newImageName)
