@@ -52,6 +52,7 @@ func KubernetesRelease() error {
 	}
 
 	// 更新服务
+	colonyEnv = strings.ToLower(colonyEnv)
 	err := engine.ExecuteReleaseService(colony, colonyEnv, namespace, serviceName, imageName)
 	if err != nil {
 		return err
