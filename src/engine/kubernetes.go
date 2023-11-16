@@ -212,7 +212,7 @@ func parseImageName(colony, imageName string) (*string, error) {
 
 // ExecuteReleaseService 执行发布服务.
 func ExecuteReleaseService(colony, env, namespace, serviceName, imageName string) error {
-	color.Blue(fmt.Sprintf("[Kubernetes] 集群: %s 环境: %s 命名空间: %s 服务名称: %s 镜像名称: %s", colony, env, namespace, serviceName, imageName))
+	color.Blue(fmt.Sprintf("[Kubernetes] Args Colony: %s Env: %s Namespace: %s ServiceName: %s ImageName: %s", colony, env, namespace, serviceName, imageName))
 	var actuator = func(f func(colony, namespace string) error) error {
 		for _, c := range strings.Split(colony, ",") {
 			for _, n := range strings.Split(namespace, ",") {
