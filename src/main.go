@@ -10,6 +10,7 @@ func main() {
 	for _, it := range cmd.Command() {
 		rootCmd.AddCommand(it)
 	}
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	err := rootCmd.Execute()
 	if err != nil {
 		return

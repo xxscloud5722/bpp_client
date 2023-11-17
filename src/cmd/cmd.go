@@ -15,7 +15,7 @@ func Command() []*cobra.Command {
 	// 发布命令
 	var releaseCmd = &cobra.Command{
 		Use:     "release",
-		Short:   "Kubernetes Release Config",
+		Short:   "Kubernetes Release",
 		Example: "release",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := console.KubernetesRelease()
@@ -29,7 +29,7 @@ func Command() []*cobra.Command {
 	// 同步Nacos 命令
 	var nacosSyncCmd = &cobra.Command{
 		Use:     "nacosSync",
-		Short:   "Nacos Config Sync",
+		Short:   "Nacos Sync (Aliyun Tencent NacosCE)",
 		Example: "nacosSync",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := console.NacosSync()
@@ -43,7 +43,7 @@ func Command() []*cobra.Command {
 	// 环境变量命令
 	var environmentCmd = &cobra.Command{
 		Use:     "env",
-		Short:   "Environment Operate Admin",
+		Short:   "Environment Operate Admin (http://127.0.0.1:8080)",
 		Example: "env list",
 	}
 
